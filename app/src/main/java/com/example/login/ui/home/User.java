@@ -4,13 +4,13 @@ public class User {
     public String emailAddress;
     public String fullName;
     public String password;
-    public String username;
+    public boolean isFirst;
 
     public User(){}
-    public User (String emailAddress, String fullName, String password,String username){
+    public User (String emailAddress, String fullName, String password){
         this.emailAddress = emailAddress;
         this.fullName = fullName;
         this.password = password;
-        this.username = username;
+        isFirst = true;
     }
 }

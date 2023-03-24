@@ -21,7 +21,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 public class Register extends AppCompatActivity {
-    EditText inputfname,inputemail,inputpass,inputconfirmPass, inputusername;
+    EditText inputfname,inputemail,inputpass,inputconfirmPass;
     Button goToLogin, register;
     FirebaseAuth firebaseAuth;
     FirebaseUser firebaseUser;
@@ -41,7 +41,6 @@ public class Register extends AppCompatActivity {
         inputemail = findViewById(R.id.inputEmail);
         inputpass = findViewById(R.id.inputPass);
         inputconfirmPass = findViewById(R.id.inputConfirmPass);
-        inputusername = findViewById(R.id.userName);
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
         firebaseDatabase = FirebaseDatabase.getInstance();
@@ -62,15 +61,14 @@ public class Register extends AppCompatActivity {
         String enterEmail = inputemail.getText().toString();
         String password = inputpass.getText().toString();
         String confirmPassword = inputconfirmPass.getText().toString();
-        String username = inputusername.getText().toString();
 
-        if(fname.isEmpty() ||  enterEmail.isEmpty()||confirmPassword.isEmpty()||password.isEmpty()||username.isEmpty())
+        if(fname.isEmpty() ||  enterEmail.isEmpty()||confirmPassword.isEmpty()||password.isEmpty())
         {
             inputfname.setError("Cannot be empty");
         } else if (!password.equals(confirmPassword)) {
             inputconfirmPass.setError("Passwords do not match");
         }else{
-            addUserDataToDatabase(enterEmail,fname,password,username);
+            addUserDataToDatabase(enterEmail,fname,password);
 
 
             progressDialog.setMessage("Processing");
@@ -93,9 +91,9 @@ public class Register extends AppCompatActivity {
         }
     }
 
-    public void addUserDataToDatabase(String enterEmail, String fname, String password,String username){
-        user = new User(enterEmail, fname, password, username);
-        databaseReference.child(username).setValue(user).addOnFailureListener(task -> {
+    public void addUserDataToDatabase(String enterEmail, String fname, String password){
+        user = new User(enterEmail, fname, password);
+        databaseReference.child(enterEmail.replace(".",",")).setValue(user).addOnFailureListener(task -> {
             Toast.makeText(this, "DATABASE ERROR", Toast.LENGTH_SHORT).show();
             System.exit(0);
         });
