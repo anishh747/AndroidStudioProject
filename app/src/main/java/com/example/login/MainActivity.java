@@ -18,33 +18,17 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class MainActivity extends AppCompatActivity {
-
-    ActivityResultLauncher pickImageLauncher;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-    Button btn = findViewById(R.id.goToRegister);
-    Button btn2 =findViewById(R.id.loadBtn);
-    ImageView img = findViewById(R.id.imageView2);
+        Button btn = findViewById(R.id.goToRegister);
 
-    btn.setOnClickListener(view -> {
-        Intent intent = new Intent(MainActivity.this, Register.class);
-        startActivity(intent);
+
+        btn.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, Register.class);
+            startActivity(intent);
     });
-
-        pickImageLauncher = registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
-            try {
-                InputStream inputStream = getContentResolver().openInputStream(uri);
-                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                img.setImageBitmap(bitmap);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-        btn2.setOnClickListener(view->{
-            pickImageLauncher.launch("image/*");
-        });
 
     }
 

@@ -1,5 +1,6 @@
 package com.example.login;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -7,30 +8,45 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.example.login.ui.home.User;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 public class Register extends AppCompatActivity {
-    EditText inputfname,inputemail,inputpass,inputconfirmPass;
+    EditText inputfname,inputemail,inputpass,inputconfirmPass, inputusername;
     Button goToLogin, register;
     FirebaseAuth firebaseAuth;
     FirebaseUser firebaseUser;
+    FirebaseDatabase firebaseDatabase;
+    DatabaseReference databaseReference;
     ProgressDialog progressDialog;
-
+    User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-    goToLogin = findViewById(R.id.LoginBtn);
-    register = findViewById(R.id.registerBtn);
-    inputfname = findViewById(R.id.inputName);
-    inputemail = findViewById(R.id.inputEmail);
-    inputpass = findViewById(R.id.inputPass);
-    inputconfirmPass = findViewById(R.id.inputConfirmPass);
-    firebaseAuth = FirebaseAuth.getInstance();
-    firebaseUser = firebaseAuth.getCurrentUser();
-    progressDialog = new ProgressDialog(this);
+        goToLogin = findViewById(R.id.LoginBtn);
+        register = findViewById(R.id.registerBtn);
+        inputfname = findViewById(R.id.inputName);
+        inputemail = findViewById(R.id.inputEmail);
+        inputpass = findViewById(R.id.inputPass);
+        inputconfirmPass = findViewById(R.id.inputConfirmPass);
+        inputusername = findViewById(R.id.userName);
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReference = firebaseDatabase.getReference("UserINFO");
+        progressDialog = new ProgressDialog(this);
 
 
         goToLogin.setOnClickListener(view -> {
@@ -46,13 +62,17 @@ public class Register extends AppCompatActivity {
         String enterEmail = inputemail.getText().toString();
         String password = inputpass.getText().toString();
         String confirmPassword = inputconfirmPass.getText().toString();
+        String username = inputusername.getText().toString();
 
-        if(fname.isEmpty() ||  enterEmail.isEmpty()||confirmPassword.isEmpty()||password.isEmpty())
+        if(fname.isEmpty() ||  enterEmail.isEmpty()||confirmPassword.isEmpty()||password.isEmpty()||username.isEmpty())
         {
             inputfname.setError("Cannot be empty");
         } else if (!password.equals(confirmPassword)) {
             inputconfirmPass.setError("Passwords do not match");
         }else{
+            addUserDataToDatabase(enterEmail,fname,password,username);
+
+
             progressDialog.setMessage("Processing");
             progressDialog.setTitle("REgistering");
             progressDialog.setCanceledOnTouchOutside(false);
@@ -61,7 +81,7 @@ public class Register extends AppCompatActivity {
             firebaseAuth.createUserWithEmailAndPassword(enterEmail,password).addOnCompleteListener(task -> {
                 if(task.isSuccessful()){
                     progressDialog.dismiss();
-                    Intent iii = new Intent(Register.this,MainActivity.class);
+                    Intent iii = new Intent(Register.this,Login.class);
                     iii.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(iii);
                     Toast.makeText(Register.this, "SUCCESSFULL", Toast.LENGTH_SHORT).show();
@@ -71,5 +91,13 @@ public class Register extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    public void addUserDataToDatabase(String enterEmail, String fname, String password,String username){
+        user = new User(enterEmail, fname, password, username);
+        databaseReference.child(username).setValue(user).addOnFailureListener(task -> {
+            Toast.makeText(this, "DATABASE ERROR", Toast.LENGTH_SHORT).show();
+            System.exit(0);
+        });
     }
 }
