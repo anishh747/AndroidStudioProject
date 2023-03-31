@@ -66,21 +66,29 @@ public class Login extends AppCompatActivity {
             progressDialog.setCanceledOnTouchOutside(false);
             progressDialog.show();
 
+            final boolean[] isFirst = new boolean[1];
             firebaseAuth.signInWithEmailAndPassword(enterEmail,password).addOnCompleteListener(task -> {
                 if(task.isSuccessful()){
-                    if(checkIfFirstLogin(enterEmail)==true){
-                        progressDialog.dismiss();
-                        Intent iii = new Intent(Login.this,AskDetails.class);
-                        iii.putExtra("USER_EMAIL",enterEmail);
-                        //startActivity(iii);
-                        //Toast.makeText(Login.this, "ASK DETAILS", Toast.LENGTH_SHORT).show();
-                    }else {
-                        progressDialog.dismiss();
-                        Intent iii = new Intent(Login.this,Dashboard.class);
-                        iii.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
-                        //startActivity(iii);
-                        //Toast.makeText(Login.this, "LOG IN PAGE", Toast.LENGTH_SHORT).show();
-                    }
+
+                    //OnComplete is asynchronous it doesnot wait for isFirst to get its value so it sets its default false value so we should keep whole code inside onComplete listener
+                    databaseReference.child(enterEmail.replace(".",",")).get().addOnCompleteListener(task1 -> {
+                        DataSnapshot dataSnapshot = task1.getResult();
+                        isFirst[0] = (boolean) dataSnapshot.child("isFirst").getValue();
+
+
+                        if(isFirst[0]==true){
+                            progressDialog.dismiss();
+                            Intent iii = new Intent(Login.this,AskDetails.class);
+                            iii.putExtra("USER_EMAIL",enterEmail);
+                            startActivity(iii);
+                        }else {
+                            progressDialog.dismiss();
+                            Intent iii = new Intent(Login.this,Dashboard.class);
+                            iii.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(iii);
+                        }
+                    });
+
 
                 }else{
                     progressDialog.dismiss();
@@ -90,14 +98,15 @@ public class Login extends AppCompatActivity {
         }
     }
 
-    private boolean checkIfFirstLogin(String enterEmail) {
-        final boolean[] isFirst = new boolean[1];
-        databaseReference.child(enterEmail.replace(".",",")).get().addOnCompleteListener(task -> {
-            DataSnapshot dataSnapshot = task.getResult();
-            isFirst[0] = (boolean) dataSnapshot.child("isFirst").getValue();
-        });
-        Toast.makeText(this, "isFirst:"+isFirst[0], Toast.LENGTH_SHORT).show();
-        return isFirst[0];
-    }
+
+//    private boolean checkIfFirstLogin(String enterEmail) {
+//        databaseReference.child(enterEmail.replace(".",",")).get().addOnCompleteListener(task -> {
+//            DataSnapshot dataSnapshot = task.getResult();
+//            boolean isFirst = (boolean) dataSnapshot.child("isFirst").getValue();
+//            Toast.makeText(this, "isFirst:"+isFirst, Toast.LENGTH_SHORT).show();
+//        });
+//        return true;
+//    }
+
 
 }

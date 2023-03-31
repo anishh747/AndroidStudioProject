@@ -1,23 +1,18 @@
 package com.example.login;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 public class MainActivity extends AppCompatActivity {
+    DrawerLayout drawerLayout;
+    NavigationView navigationView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,5 +37,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public static class User {
+        public String emailAddress;
+        public String fullName;
+        public String password;
+        public boolean isFirst;
 
+        public User(){}
+        public User (String emailAddress, String fullName, String password){
+            this.emailAddress = emailAddress;
+            this.fullName = fullName;
+            this.password = password;
+            isFirst = true;
+        }
+    }
 }
