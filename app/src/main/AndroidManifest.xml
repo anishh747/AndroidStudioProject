@@ -6,6 +6,9 @@
     <uses-permission
         android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
         android:allowBackup="true"
@@ -16,6 +19,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Login"
         tools:targetApi="31">
+        <activity
+            android:name=".CallActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ConnectingActivity"
+            android:exported="false" />
         <activity
             android:name=".AskDetails"
             android:exported="false" />
